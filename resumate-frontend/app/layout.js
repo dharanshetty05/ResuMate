@@ -12,16 +12,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ResuMate",
-  description: "Tailor your resume perfectly to any job description ✨",
+  title: 'ResuMate – AI Resume Tailor',
+  description: 'Upload a PDF resume and extract text.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-50 text-gray-900 antialiased`}>
         {children}
       </body>
     </html>

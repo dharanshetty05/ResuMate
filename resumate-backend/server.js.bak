@@ -21,7 +21,7 @@ const upload = multer({ dest: "uploads/" });
 
 // Route 1: Health check
 app.get("/", (req, res) => {
-    res.send("ResuMate Backend is running!");
+    res.send("✅ ResuMate Backend is running successfully");
 });
 
 // Route 2: Handle PDF upload + extract text
@@ -41,24 +41,22 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
 
         pdfParser.on("pdfParser_dataReady", (pdfData) => {
             try {
-                // Support both pdf2json structures (v3: formImage.Pages, v4: Pages)
-                const pages = (pdfData && pdfData.formImage && pdfData.formImage.Pages)
-                  || (pdfData && pdfData.Pages)
-                  || [];
-
-                const text = pages.map((page) =>
-                    (page.Texts || []).map((t) =>
-                        decodeURIComponent((t.R || []).map((r) => r.T).join(""))
+                // Extract all text from all pages
+                const text = pdfData.Pages.map((page) =>
+                    page.Texts.map((t) =>
+                        decodeURIComponent(
+                            t.R.map((r) => r.T).join("")
+                        )
                     ).join(" ")
                 ).join("\n\n");
 
                 // Clean up uploaded file
-                try { fs.unlinkSync(req.file.path); } catch (_) {}
+                fs.unlinkSync(req.file.path);
 
                 // Send extracted text to frontend
                 res.json({ text });
             } catch (error) {
-                try { fs.unlinkSync(req.file.path); } catch (_) {}
+                fs.unlinkSync(req.file.path);
                 res.status(500).json({ error: "Failed to process PDF data" });
             }
         });
@@ -83,3 +81,5 @@ app.post("/api/tailor", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 ResuMate backend running on http://localhost:${PORT}`);
 });
+
+
